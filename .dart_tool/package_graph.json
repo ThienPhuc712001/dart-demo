@@ -1,0 +1,68 @@
+{
+  "roots": [
+    "my_project"
+  ],
+  "packages": [
+    {
+      "name": "my_project",
+      "version": "1.0.0+1",
+      "dependencies": [
+        "path",
+        "sqlite3"
+      ],
+      "devDependencies": [
+        "lints"
+      ]
+    },
+    {
+      "name": "lints",
+      "version": "3.0.0",
+      "dependencies": []
+    },
+    {
+      "name": "sqlite3",
+      "version": "2.7.6",
+      "dependencies": [
+        "collection",
+        "ffi",
+        "meta",
+        "path",
+        "typed_data",
+        "web"
+      ]
+    },
+    {
+      "name": "typed_data",
+      "version": "1.4.0",
+      "dependencies": [
+        "collection"
+      ]
+    },
+    {
+      "name": "web",
+      "version": "1.1.1",
+      "dependencies": []
+    },
+    {
+      "name": "path",
+      "version": "1.9.1",
+      "dependencies": []
+    },
+    {
+      "name": "collection",
+      "version": "1.19.1",
+      "dependencies": []
+    },
+    {
+      "name": "ffi",
+      "version": "2.1.4",
+      "dependencies": []
+    },
+    {
+      "name": "meta",
+      "version": "1.17.0",
+      "dependencies": []
+    }
+  ],
+  "configVersion": 1
+}
