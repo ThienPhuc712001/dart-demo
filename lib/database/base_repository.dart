@@ -1,4 +1,3 @@
-  
 import 'package:my_project/database_annotations.dart';
 import 'package:my_project/database/repository.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -65,12 +64,11 @@ abstract class BaseRepository<T> implements Repository<T> {
     final idFieldName = getIdFieldName(entityType);
 
     if (tableName == null || idFieldName == null) {
-      throw Exception(\'Entity ${entityType} is not properly annotated.\');
+      throw Exception('Entity ${entityType} is not properly annotated.');
     }
 
-    final results = db.select(
-        \'SELECT * FROM $tableName WHERE $idFieldName = ?\',
-        [id]);
+    final results =
+        db.select('SELECT * FROM $tableName WHERE $idFieldName = ?', [id]);
 
     if (results.isNotEmpty) {
       return fromRow(results.first);
@@ -84,10 +82,10 @@ abstract class BaseRepository<T> implements Repository<T> {
     final tableName = getTableName(entityType);
 
     if (tableName == null) {
-      throw Exception(\'Entity ${entityType} is not properly annotated.\');
+      throw Exception('Entity ${entityType} is not properly annotated.');
     }
 
-    final results = db.select(\'SELECT * FROM $tableName\');
+    final results = db.select('SELECT * FROM $tableName');
 
     return results.map((row) => fromRow(row)).toList();
   }
@@ -99,34 +97,40 @@ abstract class BaseRepository<T> implements Repository<T> {
     final columns = getColumns(entityType);
 
     if (tableName == null || idFieldName == null) {
-      throw Exception(\'Entity ${entityType} is not properly annotated.\');
+      throw Exception('Entity ${entityType} is not properly annotated.');
     }
 
     // Lấy danh sách tên cột (không bao gồm id)
-    final columnNames = columns.where((col) => MirrorSystem.getName(col.simpleName) != idFieldName).map((col) => (col.metadata.firstWhere((metadata) => metadata.reflectee is Column).reflectee as Column).columnName).toList();
+    final columnNames = columns
+        .where((col) => MirrorSystem.getName(col.simpleName) != idFieldName)
+        .map((col) => (col.metadata
+                .firstWhere((metadata) => metadata.reflectee is Column)
+                .reflectee as Column)
+            .columnName)
+        .toList();
     // Lấy danh sách tham số (dấu ?)
-    final params = List.generate(columnNames.length, (index) => \'?\').join(\', \');
+    final params = List.generate(columnNames.length, (index) => '?').join(', ');
 
     // Tạo câu lệnh INSERT
-    String sql = \'INSERT INTO $tableName (${columnNames.join(\', \')}) VALUES ($params)\';
+    String sql =
+        'INSERT INTO $tableName (${columnNames.join(', ')}) VALUES ($params)';
 
     // Lấy giá trị của các trường
     List values = [];
     InstanceMirror instanceMirror = reflect(entity);
-    for(var col in columns){
-       String name = MirrorSystem.getName(col.simpleName);
-       if(name != idFieldName){
-         values.add(instanceMirror.getField(col.simpleName).reflectee);
-       }
+    for (var col in columns) {
+      String name = MirrorSystem.getName(col.simpleName);
+      if (name != idFieldName) {
+        values.add(instanceMirror.getField(col.simpleName).reflectee);
+      }
     }
 
     try {
       db.execute(sql, values);
       final id = db.lastInsertRowId;
       return id;
-
     } catch (e) {
-      print(\'Error inserting entity: $e\');
+      print('Error inserting entity: $e');
       return 0;
     }
   }
@@ -138,7 +142,7 @@ abstract class BaseRepository<T> implements Repository<T> {
     final columns = getColumns(entityType);
 
     if (tableName == null || idFieldName == null) {
-      throw Exception(\'Entity ${entityType} is not properly annotated.\');
+      throw Exception('Entity ${entityType} is not properly annotated.');
     }
 
     // Lấy danh sách tên cột và giá trị để cập nhật
@@ -149,25 +153,30 @@ abstract class BaseRepository<T> implements Repository<T> {
     for (var col in columns) {
       String name = MirrorSystem.getName(col.simpleName);
       if (name != idFieldName) {
-        String columnName = (col.metadata.firstWhere((metadata) => metadata.reflectee is Column).reflectee as Column).columnName;
-        setClauses.add(\'$columnName = ?\');
+        String columnName = (col.metadata
+                .firstWhere((metadata) => metadata.reflectee is Column)
+                .reflectee as Column)
+            .columnName;
+        setClauses.add('$columnName = ?');
         values.add(instanceMirror.getField(col.simpleName).reflectee);
       }
     }
 
     // Lấy giá trị ID
-    VariableMirror idField = columns.firstWhere((element) => MirrorSystem.getName(element.simpleName) == idFieldName);
+    VariableMirror idField = columns.firstWhere(
+        (element) => MirrorSystem.getName(element.simpleName) == idFieldName);
     dynamic idValue = instanceMirror.getField(idField.simpleName).reflectee;
 
     // Tạo câu lệnh UPDATE
-    String sql = \'UPDATE $tableName SET ${setClauses.join(\', \')} WHERE $idFieldName = ?\';
+    String sql =
+        'UPDATE $tableName SET ${setClauses.join(', ')} WHERE $idFieldName = ?';
     values.add(idValue);
 
     try {
-        db.execute(sql, values);
-        return 1; // Trả về 1 nếu thành công
+      db.execute(sql, values);
+      return 1; // Trả về 1 nếu thành công
     } catch (e) {
-      print(\'Error updating entity: $e\');
+      print('Error updating entity: $e');
       return 0; // Trả về 0 nếu thất bại
     }
   }
@@ -178,16 +187,15 @@ abstract class BaseRepository<T> implements Repository<T> {
     final idFieldName = getIdFieldName(entityType);
 
     if (tableName == null || idFieldName == null) {
-      throw Exception(\'Entity ${entityType} is not properly annotated.\');
+      throw Exception('Entity ${entityType} is not properly annotated.');
     }
 
     try {
-      db.execute(\'DELETE FROM $tableName WHERE $idFieldName = ?\', [id]);
+      db.execute('DELETE FROM $tableName WHERE $idFieldName = ?', [id]);
       return 1; // Trả về 1 nếu thành công
     } catch (e) {
-      print(\'Error deleting entity: $e\');
+      print('Error deleting entity: $e');
       return 0; // Trả về 0 nếu thất bại
     }
   }
 }
-
